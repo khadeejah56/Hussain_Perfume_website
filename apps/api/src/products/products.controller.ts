@@ -10,6 +10,7 @@ import { UpdateProductDto } from "./dto/update-product.dto";
 import { QueryProductDto } from "./dto/query-product.dto";
 import { CreateProductVariantDto } from "./dto/product-variant.dto";
 import { UpdateProductVariantDto } from "./dto/update-product-variant.dto";
+import { CreateProductImageDto } from "./dto/product-image.dto";
 
 @ApiTags("products")
 @Controller("products")
@@ -82,5 +83,19 @@ export class ProductsController {
   @Delete("variants/:variantId")
   removeVariant(@Param("variantId") variantId: string) {
     return this.productsService.removeVariant(variantId);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Post(":id/images")
+  addImage(@Param("id") id: string, @Body() dto: CreateProductImageDto) {
+    return this.productsService.addImage(id, dto);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Delete("images/:imageId")
+  removeImage(@Param("imageId") imageId: string) {
+    return this.productsService.removeImage(imageId);
   }
 }

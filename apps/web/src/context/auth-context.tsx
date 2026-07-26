@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { apiFetch, ApiError } from "@/lib/api";
+import { apiFetch, apiUpload, ApiError } from "@/lib/api";
 import type { AuthResult, AuthUser, UserProfile } from "@/lib/types";
 
 const ACCESS_KEY = "hp.accessToken";
@@ -23,6 +23,7 @@ interface AuthContextValue {
   register: (payload: RegisterPayload) => Promise<void>;
   logout: () => Promise<void>;
   authFetch: <T>(path: string, options?: Parameters<typeof apiFetch>[1]) => Promise<T>;
+  uploadFile: <T>(path: string, file: File) => Promise<T>;
   refreshProfile: () => Promise<void>;
 }
 
@@ -127,6 +128,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [doRefresh, clear],
   );
 
+  const uploadFile = useCallback(
+    async <T,>(path: string, file: File): Promise<T> => {
+      try {
+        return await apiUpload<T>(path, file, accessTokenRef.current);
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401 && refreshTokenRef.current) {
+          try {
+            const newToken = await doRefresh();
+            return await apiUpload<T>(path, file, newToken);
+          } catch {
+            clear();
+            throw error;
+          }
+        }
+        throw error;
+      }
+    },
+    [doRefresh, clear],
+  );
+
   const refreshProfile = useCallback(async () => {
     if (!refreshTokenRef.current) return;
     const profile = await authFetch<UserProfile>("/users/me");
@@ -135,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [authFetch]);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, authFetch, refreshProfile }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, authFetch, uploadFile, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

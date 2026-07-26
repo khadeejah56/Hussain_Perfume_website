@@ -6,6 +6,7 @@ import type { UpdateProductDto } from "./dto/update-product.dto";
 import { ProductSortBy, type QueryProductDto } from "./dto/query-product.dto";
 import type { CreateProductVariantDto } from "./dto/product-variant.dto";
 import type { UpdateProductVariantDto } from "./dto/update-product-variant.dto";
+import type { CreateProductImageDto } from "./dto/product-image.dto";
 
 const PRODUCT_INCLUDE = {
   images: { orderBy: { position: "asc" as const } },
@@ -172,6 +173,19 @@ export class ProductsService {
     } catch (error) {
       throw this.mapKnownError(error);
     }
+  }
+
+  async addImage(productId: string, dto: CreateProductImageDto) {
+    await this.findById(productId);
+    return this.prisma.productImage.create({ data: { ...dto, productId } });
+  }
+
+  async removeImage(imageId: string) {
+    const image = await this.prisma.productImage.findUnique({ where: { id: imageId } });
+    if (!image) {
+      throw new NotFoundException(`Product image with id "${imageId}" not found`);
+    }
+    await this.prisma.productImage.delete({ where: { id: imageId } });
   }
 
   async remove(id: string) {

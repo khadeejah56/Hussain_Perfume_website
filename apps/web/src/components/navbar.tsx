@@ -55,7 +55,7 @@ export function Navbar() {
       className="sticky top-0 z-40 bg-[var(--background)]/90 backdrop-blur"
     >
       <div className="border-b border-gold-900/20 bg-neutral-900 text-center text-[11px] uppercase tracking-[0.25em] text-gold-200">
-        <p className="py-2">Complimentary shipping on all orders over $150</p>
+        <p className="py-2">Complimentary shipping on all orders over Rs 15,000</p>
       </div>
 
       <div className="border-b border-gold-800/15">
@@ -107,6 +107,11 @@ export function Navbar() {
 
           {user ? (
             <div className="flex items-center gap-3 text-sm">
+              {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+                <Link href="/admin/products" className="text-neutral-700 hover:text-gold-700">
+                  Admin
+                </Link>
+              )}
               <Link href="/account" className="text-neutral-700 hover:text-gold-700">
                 {user.firstName}
               </Link>

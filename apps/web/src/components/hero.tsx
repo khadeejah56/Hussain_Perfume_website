@@ -35,7 +35,7 @@ export function Hero() {
           Hussain Perfumes
         </motion.p>
         <motion.div variants={item} className="mx-auto mt-4 h-px w-16 bg-gold-700/60" />
-        <motion.h1 variants={item} className="mt-6 font-display text-5xl font-medium sm:text-6xl">
+        <motion.h1 variants={item} className="mt-6 font-display text-5xl font-semibold tracking-tight sm:text-7xl">
           A scent that stays with you
         </motion.h1>
         <motion.p variants={item} className="mx-auto mt-5 max-w-xl text-neutral-300">

@@ -1,6 +1,7 @@
 export function formatPrice(value: string | number): string {
   const amount = typeof value === "string" ? Number(value) : value;
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+  const formatted = new Intl.NumberFormat("en-PK", { maximumFractionDigits: 0 }).format(amount);
+  return `Rs ${formatted}`;
 }
 
 export function formatDate(value: string): string {

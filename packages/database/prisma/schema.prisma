@@ -334,7 +334,7 @@ model Order {
   shippingAmount  Decimal @default(0) @db.Decimal(10, 2)
   taxAmount       Decimal @default(0) @db.Decimal(10, 2)
   totalAmount     Decimal @db.Decimal(10, 2)
-  currency        String  @default("USD")
+  currency        String  @default("PKR")
 
   couponId String?
   coupon   Coupon? @relation(fields: [couponId], references: [id])
@@ -394,7 +394,7 @@ model Payment {
   provider       PaymentMethod
   status         PaymentStatus
   amount         Decimal       @db.Decimal(10, 2)
-  currency       String        @default("USD")
+  currency       String        @default("PKR")
   transactionRef String?
   rawResponse    Json?
   createdAt      DateTime      @default(now())

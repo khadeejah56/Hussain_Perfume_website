@@ -59,8 +59,8 @@ async function main() {
       },
       variants: {
         create: [
-          { sku: "HUS-OUDR-50", volumeMl: 50, price: 89.0, stock: 25 },
-          { sku: "HUS-OUDR-100", volumeMl: 100, price: 149.0, stock: 15 },
+          { sku: "HUS-OUDR-50", volumeMl: 50, price: 24900, stock: 25 },
+          { sku: "HUS-OUDR-100", volumeMl: 100, price: 41900, stock: 15 },
         ],
       },
     },
