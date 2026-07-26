@@ -5,8 +5,13 @@ class EnvironmentVariables {
   @IsIn(["development", "production", "test"])
   NODE_ENV!: string;
 
+  @IsOptional()
   @IsNumberString()
-  API_PORT!: string;
+  API_PORT?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  PORT?: string;
 
   @IsNotEmpty()
   DATABASE_URL!: string;
