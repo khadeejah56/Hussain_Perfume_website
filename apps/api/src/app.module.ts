@@ -11,6 +11,14 @@ import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { AuthModule } from "./auth/auth.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { ProductsModule } from "./products/products.module";
+import { UsersModule } from "./users/users.module";
+import { AddressesModule } from "./addresses/addresses.module";
+import { WishlistModule } from "./wishlist/wishlist.module";
+import { CartModule } from "./cart/cart.module";
+import { CouponsModule } from "./coupons/coupons.module";
+import { OrdersModule } from "./orders/orders.module";
+import { ReviewsModule } from "./reviews/reviews.module";
+import { UploadsModule } from "./uploads/uploads.module";
 import { HealthController } from "./health/health.controller";
 
 @Module({
@@ -26,6 +34,14 @@ import { HealthController } from "./health/health.controller";
     AuthModule,
     CategoriesModule,
     ProductsModule,
+    UsersModule,
+    AddressesModule,
+    WishlistModule,
+    CartModule,
+    CouponsModule,
+    OrdersModule,
+    ReviewsModule,
+    UploadsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

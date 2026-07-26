@@ -7,8 +7,12 @@ allowBuilds:
   '@prisma/engines': true
   '@scarf/scarf': false
   prisma: true
+  sharp: true
+  unrs-resolver: true
 onlyBuiltDependencies:
   - "@nestjs/core"
   - "@prisma/client"
   - "@prisma/engines"
   - prisma
+  - sharp
+  - unrs-resolver

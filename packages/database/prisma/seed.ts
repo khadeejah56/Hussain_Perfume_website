@@ -55,7 +55,7 @@ async function main() {
       isNewArrival: true,
       categoryId: menCategory.id,
       images: {
-        create: [{ url: "https://placehold.co/800x800?text=Oud+Royale", position: 0 }],
+        create: [{ url: "https://placehold.co/800x800.png?text=Oud+Royale", position: 0 }],
       },
       variants: {
         create: [
