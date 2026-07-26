@@ -1,10 +1,56 @@
-
-
-
-
+# Hussain Perfumes
 
 A full-stack luxury perfume e-commerce platform: a NestJS REST API backed by
 PostgreSQL/Prisma, and a Next.js storefront with a built-in admin dashboard.
+
+## Quick Start (for testers)
+
+Want to just run this on your own computer and click around? Follow these
+exactly, in order.
+
+**You'll need:** [Node.js 20+](https://nodejs.org) and a free
+[Neon](https://neon.tech) Postgres database (takes ~1 minute to create — sign
+up, click "New Project", then copy the connection string it shows you).
+
+```bash
+# 1. Get the code
+git clone https://github.com/khadeejah56/Hussain_Perfume_website.git
+cd Hussain_Perfume_website
+
+# 2. Enable pnpm and install dependencies
+corepack enable
+pnpm install
+```
+
+**3. Create your environment files.** Create three files with this content
+(paste it as-is, just replace `DATABASE_URL` with the connection string Neon
+gave you):
+
+`.env`, `apps/api/.env`, and `apps/web/.env.local` — all three need the
+content from `.env.example` in the repo root. The quickest way:
+```bash
+cp .env.example .env
+cp .env.example apps/api/.env
+cp .env.example apps/web/.env.local
+```
+Then open each of those three files and replace the `DATABASE_URL` line with
+your real Neon connection string. Everything else can stay as-is for local
+testing.
+
+```bash
+# 4. Set up the database (creates tables + an admin account + a sample product)
+pnpm db:migrate
+pnpm db:seed
+
+# 5. Run it
+pnpm dev
+```
+
+Open **http://localhost:3000** in your browser — that's the storefront.
+
+- **Admin login:** `hussainirshad5432@gmail.com` / `ChangeMe123!` (or just
+  register your own account with "Register" to test as a regular customer)
+- **API docs:** http://localhost:4000/api/docs
 
 ## Features
 
