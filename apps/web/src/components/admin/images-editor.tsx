@@ -22,6 +22,7 @@ export function ImagesEditor({
   const { uploadFile } = useAuth();
   const { showToast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -33,10 +34,22 @@ export function ImagesEditor({
       const result = await uploadFile<{ url: string; publicId: string }>("/uploads/image", file);
       onChange([...images, { key: crypto.randomUUID(), url: result.url }]);
     } catch (error) {
-      showToast(error instanceof ApiError ? error.message : "Upload failed", "error");
+      showToast(
+        error instanceof ApiError
+          ? `${error.message} — use "Add by URL" below instead`
+          : "Upload failed — use \"Add by URL\" below instead",
+        "error",
+      );
     } finally {
       setIsUploading(false);
     }
+  }
+
+  function handleAddUrl() {
+    const url = urlInput.trim();
+    if (!url) return;
+    onChange([...images, { key: crypto.randomUUID(), url }]);
+    setUrlInput("");
   }
 
   function remove(key: string) {
@@ -61,10 +74,37 @@ export function ImagesEditor({
         ))}
       </div>
 
-      <label className="inline-block cursor-pointer rounded border border-dashed border-neutral-300 px-4 py-2 text-sm text-neutral-600 hover:border-gold-600">
-        {isUploading ? "Uploading..." : "+ Upload Image"}
-        <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={handleFileSelect} disabled={isUploading} className="hidden" />
-      </label>
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="inline-block cursor-pointer rounded border border-dashed border-neutral-300 px-4 py-2 text-sm text-neutral-600 hover:border-gold-600">
+          {isUploading ? "Uploading..." : "+ Upload Image"}
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/avif"
+            onChange={handleFileSelect}
+            disabled={isUploading}
+            className="hidden"
+          />
+        </label>
+
+        <span className="text-xs text-neutral-400">or</span>
+
+        <div className="flex gap-2">
+          <input
+            type="url"
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+            placeholder="Paste an image URL"
+            className="w-64 rounded border border-neutral-300 px-3 py-1.5 text-sm"
+          />
+          <button
+            type="button"
+            onClick={handleAddUrl}
+            className="rounded border border-neutral-300 px-3 py-1.5 text-sm hover:border-gold-600"
+          >
+            Add by URL
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

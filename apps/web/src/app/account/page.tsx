@@ -9,9 +9,10 @@ import { FadeIn } from "@/components/motion/fade-in";
 import type { UserProfile } from "@/lib/types";
 
 export default function AccountProfilePage() {
-  const { authFetch } = useAuth();
+  const { authFetch, refreshProfile } = useAuth();
   const { showToast } = useToast();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -26,6 +27,7 @@ export default function AccountProfilePage() {
   useEffect(() => {
     authFetch<UserProfile>("/users/me").then((data) => {
       setProfile(data);
+      setEmail(data.email);
       setFirstName(data.firstName);
       setLastName(data.lastName);
       setPhone(data.phone ?? "");
@@ -40,9 +42,10 @@ export default function AccountProfilePage() {
     try {
       const updated = await authFetch<UserProfile>("/users/me", {
         method: "PATCH",
-        body: { firstName, lastName, phone: phone || undefined },
+        body: { email, firstName, lastName, phone: phone || undefined },
       });
       setProfile(updated);
+      await refreshProfile();
       showToast("Profile updated");
     } catch (error) {
       setProfileError(error instanceof ApiError ? error.message : "Update failed");
@@ -74,7 +77,19 @@ export default function AccountProfilePage() {
       <section>
         <h1 className="mb-4 font-display text-2xl font-semibold text-neutral-900">Profile</h1>
         <form onSubmit={handleProfileSubmit} className="max-w-md space-y-3">
-          <p className="text-sm text-neutral-500">{profile.email}</p>
+          <div>
+            <label className="mb-1 block text-sm text-neutral-700">Email</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded border border-neutral-300 px-3 py-2"
+            />
+            {!profile.isEmailVerified && (
+              <p className="mt-1 text-xs text-neutral-400">Not verified</p>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <input
               value={firstName}

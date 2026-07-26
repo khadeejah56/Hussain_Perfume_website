@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from "bcryptjs";
 import { Prisma, type User } from "@hussain/database";
 import { PrismaService } from "../prisma/prisma.service";
@@ -21,8 +21,27 @@ export class UsersService {
   }
 
   async updateProfile(id: string, dto: UpdateProfileDto) {
-    await this.assertExists(id);
-    const user = await this.prisma.user.update({ where: { id }, data: dto });
+    const existing = await this.prisma.user.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`User with id "${id}" not found`);
+    }
+
+    const data: Prisma.UserUpdateInput = {
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      phone: dto.phone,
+    };
+
+    if (dto.email && dto.email !== existing.email) {
+      const emailTaken = await this.prisma.user.findUnique({ where: { email: dto.email } });
+      if (emailTaken) {
+        throw new ConflictException("An account with this email already exists");
+      }
+      data.email = dto.email;
+      data.isEmailVerified = false;
+    }
+
+    const user = await this.prisma.user.update({ where: { id }, data });
     return this.toPublicUser(user);
   }
 
