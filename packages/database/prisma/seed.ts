@@ -66,6 +66,12 @@ async function main() {
     },
   });
 
+  await prisma.siteSetting.upsert({
+    where: { key: "shippingBannerText" },
+    update: {},
+    create: { key: "shippingBannerText", value: "Complimentary shipping on all orders over Rs 15,000" },
+  });
+
   console.log({ admin: admin.email, categories: [menCategory.slug, womenCategory.slug], product: product.slug });
 }
 

@@ -189,9 +189,29 @@ export interface Order {
   shippingPostalCode: string;
   shippingCountry: string;
   customerNote: string | null;
+  courierName: string | null;
+  trackingNumber: string | null;
+  dispatchedAt: string | null;
   createdAt: string;
   items: OrderItem[];
   payments: Payment[];
+  user?: { id: string; email: string; firstName: string; lastName: string };
+}
+
+export interface OrderStats {
+  totalSales: number;
+  totalOrders: number;
+  incompleteOrders: number;
+  processingOrders: number;
+  dispatchedOrders: number;
+  deliveredOrders: number;
+  returnedOrders: number;
+  cancelledOrders: number;
+}
+
+export interface SiteSettings {
+  shippingBannerText: string;
+  [key: string]: string;
 }
 
 export interface Review {

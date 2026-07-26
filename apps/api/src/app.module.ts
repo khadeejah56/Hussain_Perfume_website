@@ -19,6 +19,7 @@ import { CouponsModule } from "./coupons/coupons.module";
 import { OrdersModule } from "./orders/orders.module";
 import { ReviewsModule } from "./reviews/reviews.module";
 import { UploadsModule } from "./uploads/uploads.module";
+import { SettingsModule } from "./settings/settings.module";
 import { HealthController } from "./health/health.controller";
 
 @Module({
@@ -42,6 +43,7 @@ import { HealthController } from "./health/health.controller";
     OrdersModule,
     ReviewsModule,
     UploadsModule,
+    SettingsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

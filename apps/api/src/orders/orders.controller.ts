@@ -9,6 +9,7 @@ import { OrdersService } from "./orders.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
 import { UpdatePaymentStatusDto } from "./dto/update-payment-status.dto";
+import { DispatchOrderDto } from "./dto/dispatch-order.dto";
 import { QueryOrdersDto } from "./dto/query-orders.dto";
 
 @ApiTags("orders")
@@ -35,6 +36,13 @@ export class OrdersController {
 
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Get("admin/stats")
+  getStats() {
+    return this.ordersService.getStats();
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @Get("admin/:id")
   findOneAdmin(@Param("id") id: string) {
     return this.ordersService.findOneAdmin(id);
@@ -52,6 +60,13 @@ export class OrdersController {
   @Patch("admin/:id/payment")
   updatePaymentStatus(@Param("id") id: string, @Body() dto: UpdatePaymentStatusDto) {
     return this.ordersService.updatePaymentStatus(id, dto);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Patch("admin/:id/dispatch")
+  dispatch(@Param("id") id: string, @Body() dto: DispatchOrderDto) {
+    return this.ordersService.dispatch(id, dto);
   }
 
   @Get(":id")

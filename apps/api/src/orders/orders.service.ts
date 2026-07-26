@@ -6,11 +6,13 @@ import { CouponsService } from "../coupons/coupons.service";
 import type { CreateOrderDto } from "./dto/create-order.dto";
 import type { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
 import type { UpdatePaymentStatusDto } from "./dto/update-payment-status.dto";
+import type { DispatchOrderDto } from "./dto/dispatch-order.dto";
 import type { QueryOrdersDto } from "./dto/query-orders.dto";
 
 const ORDER_INCLUDE = {
   items: true,
   payments: { orderBy: { createdAt: "desc" as const } },
+  user: { select: { id: true, email: true, firstName: true, lastName: true } },
 };
 
 const TERMINAL_STATUSES: OrderStatus[] = [OrderStatus.CANCELLED, OrderStatus.REFUNDED];
@@ -159,10 +161,7 @@ export class OrdersService {
   }
 
   async findOneAdmin(id: string) {
-    const order = await this.prisma.order.findUnique({
-      where: { id },
-      include: { ...ORDER_INCLUDE, user: { select: { id: true, email: true, firstName: true, lastName: true } } },
-    });
+    const order = await this.prisma.order.findUnique({ where: { id }, include: ORDER_INCLUDE });
     if (!order) {
       throw new NotFoundException(`Order with id "${id}" not found`);
     }
@@ -232,6 +231,52 @@ export class OrdersService {
     ]);
 
     return this.findOneAdmin(id);
+  }
+
+  async dispatch(id: string, dto: DispatchOrderDto) {
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order) {
+      throw new NotFoundException(`Order with id "${id}" not found`);
+    }
+    if (TERMINAL_STATUSES.includes(order.status)) {
+      throw new BadRequestException(`Cannot dispatch an order that is already ${order.status.toLowerCase()}`);
+    }
+
+    await this.prisma.order.update({
+      where: { id },
+      data: {
+        courierName: dto.courierName,
+        trackingNumber: dto.trackingNumber,
+        dispatchedAt: new Date(),
+        status: OrderStatus.SHIPPED,
+      },
+    });
+
+    return this.findOneAdmin(id);
+  }
+
+  async getStats() {
+    const [statusCounts, salesAgg, totalOrders] = await Promise.all([
+      this.prisma.order.groupBy({ by: ["status"], _count: { _all: true } }),
+      this.prisma.order.aggregate({ where: { paymentStatus: PaymentStatus.PAID }, _sum: { totalAmount: true } }),
+      this.prisma.order.count(),
+    ]);
+
+    const countFor = (statuses: OrderStatus[]) =>
+      statusCounts
+        .filter((row) => statuses.includes(row.status))
+        .reduce((sum, row) => sum + row._count._all, 0);
+
+    return {
+      totalSales: Number(salesAgg._sum.totalAmount ?? 0),
+      totalOrders,
+      incompleteOrders: countFor([OrderStatus.PENDING]),
+      processingOrders: countFor([OrderStatus.CONFIRMED, OrderStatus.PROCESSING, OrderStatus.PACKED]),
+      dispatchedOrders: countFor([OrderStatus.SHIPPED]),
+      deliveredOrders: countFor([OrderStatus.DELIVERED]),
+      returnedOrders: countFor([OrderStatus.RETURNED, OrderStatus.REFUNDED]),
+      cancelledOrders: countFor([OrderStatus.CANCELLED]),
+    };
   }
 
   private async paginate(where: Record<string, unknown>, query: QueryOrdersDto) {

@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useAuth } from "@/context/auth-context";
 import { useCart } from "@/context/cart-context";
+import { apiFetch } from "@/lib/api";
+import type { SiteSettings } from "@/lib/types";
+
+const DEFAULT_BANNER = "Complimentary shipping on all orders over Rs 15,000";
 
 const NAV_LINKS = [
   { label: "All Fragrances", href: "/products" },
@@ -29,11 +33,18 @@ export function Navbar() {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [scrolled, setScrolled] = useState(false);
+  const [bannerText, setBannerText] = useState(DEFAULT_BANNER);
 
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 8);
   });
+
+  useEffect(() => {
+    apiFetch<SiteSettings>("/settings")
+      .then((data) => setBannerText(data.shippingBannerText))
+      .catch(() => {});
+  }, []);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -55,7 +66,7 @@ export function Navbar() {
       className="sticky top-0 z-40 bg-[var(--background)]/90 backdrop-blur"
     >
       <div className="border-b border-gold-900/20 bg-neutral-900 text-center text-[11px] uppercase tracking-[0.25em] text-gold-200">
-        <p className="py-2">Complimentary shipping on all orders over Rs 15,000</p>
+        <p className="py-2">{bannerText}</p>
       </div>
 
       <div className="border-b border-gold-800/15">
@@ -108,7 +119,7 @@ export function Navbar() {
           {user ? (
             <div className="flex items-center gap-3 text-sm">
               {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
-                <Link href="/admin/products" className="text-neutral-700 hover:text-gold-700">
+                <Link href="/admin" className="text-neutral-700 hover:text-gold-700">
                   Admin
                 </Link>
               )}
